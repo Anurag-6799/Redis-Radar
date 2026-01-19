@@ -24,21 +24,25 @@
 Redis Radar brings a full-featured Redis GUI right into VS Code, designed for developers who want speed and efficiency.
 
 ### 🔌 Connection Management
+
 - **Multiple Profiles**: Manage unlimited local and remote Redis connections.
 - **Secure**: Support for password authentication and clean profile management.
 - **Status Indicators**: Instant visual feedback on connection health.
 
 ### 🔍 Smart Explorer
+
 - **Lazy Loading**: Efficiently handles databases with thousands of keys.
 - **Quick Search**: Filter keys instantly using glob patterns (e.g., `user:*`).
 - **Rich Visualization**: Icons differentiate key types (String, List, Set, Hash, etc.).
 
 ### 📝 Data Viewer
+
 - **JSON Pretty-Print**: Automatically formats JSON values for readability.
 - **Type Inspection**: View key TTL, type, and size at a glance.
 - **Clipboard Support**: One-click copy for keys and values.
 
 ### ⚡ Quick Actions
+
 - **Inline Controls**: Connect, disconnect, and delete directly from the sidebar.
 - **Flush DB**: Safely clear databases with a dedicated command.
 - **Key Management**: Delete individual keys effortlessly.
@@ -47,13 +51,13 @@ Redis Radar brings a full-featured Redis GUI right into VS Code, designed for de
 
 ## 🛠️ Getting Started
 
-1.  **Open Redis Radar**: Click the Redis icon in the Activity Bar.
-2.  **Add Connection**:
-    - Click the `+` button.
-    - Enter a name (e.g., "Local"), Host (`localhost`), and Port (`6379`).
-    - Click **Save**.
-3.  **Connect**: Click the **Play** button on your new profile.
-4.  **Explore**: Expand the connection to view and interact with your Redis keys.
+1. **Open Redis Radar**: Click the Redis icon in the Activity Bar.
+2. **Add Connection**:
+   - Click the `+` button.
+   - Enter a name (e.g., "Local"), Host (`localhost`), and Port (`6379`).
+   - Click **Save**.
+3. **Connect**: Click the **Play** button on your new profile.
+4. **Explore**: Expand the connection to view and interact with your Redis keys.
 
 ---
 
@@ -62,21 +66,3 @@ Redis Radar brings a full-featured Redis GUI right into VS Code, designed for de
 - **VS Code**: v1.85.0 or higher.
 - **Redis Server**: Local, Docker, or Cloud instance.
 
----
-
-## 📦 Extension Settings
-
-This extension contributes the following settings:
-
-*   `redisLite.host`: Default host for quick connections.
-*   `redisLite.port`: Default port.
-
----
-
-## 🤝 Contributing
-
-Found a bug or have a feature request? Open an issue on our [GitHub Repository](https://github.com/Anurag-6799/Redis-Radar).
-
----
-
-**Enjoying Redis Radar?** Please rate us on the marketplace! ⭐
