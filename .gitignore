@@ -1,0 +1,9 @@
+out/
+node_modules/
+.vscode-test/
+.DS_Store
+*.vsix
+.gemini/
+.idea/
+.vscode/launch.json
+.vscode/tasks.json

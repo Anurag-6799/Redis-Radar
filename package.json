@@ -1,0 +1,161 @@
+{
+    "name": "redis-insight-lite",
+    "displayName": "Redis Radar",
+    "publisher": "antigravity",
+    "description": "A lightweight Redis client for VS Code",
+    "version": "0.1.0",
+    "engines": {
+        "vscode": "^1.85.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onView:redisConnections",
+        "onView:redisExplorer"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "redis-explorer-container",
+                    "title": "Redis Radar",
+                    "icon": "resources/redis-icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "redis-explorer-container": [
+                {
+                    "id": "redisConnections",
+                    "name": "Connections",
+                    "icon": "$(plug)"
+                },
+                {
+                    "id": "redisExplorer",
+                    "name": "Explorer",
+                    "icon": "$(list-tree)"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "redisLite.refresh",
+                "title": "Refresh",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "redisLite.deleteKey",
+                "title": "Delete Key",
+                "icon": "$(trash)"
+            },
+            {
+                "command": "redisLite.flushDb",
+                "title": "Flush DB",
+                "icon": "$(clear-all)"
+            },
+            {
+                "command": "redisLite.addConnection",
+                "title": "Add Connection",
+                "icon": "$(add)"
+            },
+            {
+                "command": "redisLite.connect",
+                "title": "Connect",
+                "icon": "$(play)"
+            },
+            {
+                "command": "redisLite.deleteConnection",
+                "title": "Delete Connection",
+                "icon": "$(trash)"
+            },
+            {
+                "command": "redisLite.disconnect",
+                "title": "Disconnect",
+                "icon": "$(debug-stop)"
+            },
+            {
+                "command": "redisLite.loadMore",
+                "title": "Load More Keys",
+                "icon": "$(cloud-download)"
+            },
+            {
+                "command": "redisLite.search",
+                "title": "Search Keys",
+                "icon": "$(search)"
+            }
+        ],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "redisLite.addConnection",
+                    "when": "view == redisConnections",
+                    "group": "navigation"
+                },
+                {
+                    "command": "redisLite.refresh",
+                    "when": "view == redisExplorer && redisLite:isConnected",
+                    "group": "navigation"
+                },
+                {
+                    "command": "redisLite.search",
+                    "when": "view == redisExplorer && redisLite:isConnected",
+                    "group": "navigation"
+                },
+                {
+                    "command": "redisLite.flushDb",
+                    "when": "view == redisExplorer && redisLite:isConnected",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "redisLite.connect",
+                    "when": "view == redisConnections && viewItem == disconnectedContext",
+                    "group": "inline"
+                },
+                {
+                    "command": "redisLite.disconnect",
+                    "when": "view == redisConnections && viewItem == connectedContext",
+                    "group": "inline"
+                },
+                {
+                    "command": "redisLite.deleteConnection",
+                    "when": "view == redisConnections && (viewItem == connectedContext || viewItem == disconnectedContext)",
+                    "group": "inline"
+                },
+                {
+                    "command": "redisLite.deleteKey",
+                    "when": "view == redisExplorer && viewItem == redisKey",
+                    "group": "inline"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.85.0",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "20.2.5",
+        "@typescript-eslint/eslint-plugin": "^5.59.8",
+        "@typescript-eslint/parser": "^5.59.8",
+        "eslint": "^8.41.0",
+        "glob": "^8.1.0",
+        "mocha": "^10.2.0",
+        "typescript": "^5.1.3",
+        "@vscode/test-electron": "^2.3.2"
+    },
+    "dependencies": {
+        "ioredis": "^5.3.2",
+        "@types/ioredis": "^5.0.0"
+    }
+}
