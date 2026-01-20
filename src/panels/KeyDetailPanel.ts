@@ -59,19 +59,50 @@ export class KeyDetailPanel {
         const { type, ttl, value } = data;
         let formattedValue = '';
         let isJson = false;
+        let valueHtml = '';
+
+        let parsedData: any = null;
 
         if (typeof value === 'object') {
+            parsedData = value;
             formattedValue = JSON.stringify(value, null, 2);
             isJson = true;
         } else {
             try {
-                const json = JSON.parse(value);
-                formattedValue = JSON.stringify(json, null, 2);
+                parsedData = JSON.parse(value);
+                formattedValue = JSON.stringify(parsedData, null, 2);
                 isJson = true;
             } catch {
                 formattedValue = String(value);
             }
         }
+
+        // Generate Table or Pre block
+        if (isJson && typeof parsedData === 'object' && parsedData !== null) {
+            valueHtml = '<table class="value-table">';
+            if (Array.isArray(parsedData)) {
+                // Array handling
+                valueHtml += '<thead><tr><th>Index</th><th>Value</th></tr></thead><tbody>';
+                parsedData.forEach((item, index) => {
+                    const itemStr = typeof item === 'object' ? JSON.stringify(item) : String(item);
+                    valueHtml += `<tr><td class="key-col">${index}</td><td class="val-col">${this._escapeHtml(itemStr)}</td></tr>`;
+                });
+                valueHtml += '</tbody>';
+            } else {
+                // Object handling
+                valueHtml += '<thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>';
+                Object.keys(parsedData).forEach(k => {
+                    const v = parsedData[k];
+                    const vStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                    valueHtml += `<tr><td class="key-col">${this._escapeHtml(k)}</td><td class="val-col">${this._escapeHtml(vStr)}</td></tr>`;
+                });
+                valueHtml += '</tbody>';
+            }
+            valueHtml += '</table>';
+        } else {
+            valueHtml = `<pre>${this._escapeHtml(formattedValue)}</pre>`;
+        }
+
 
         return `<!DOCTYPE html>
 <html lang="en">
@@ -125,6 +156,7 @@ export class KeyDetailPanel {
             padding: 15px;
             border-radius: 6px;
             position: relative;
+            overflow-x: auto;
         }
         pre {
             margin: 0;
@@ -144,9 +176,39 @@ export class KeyDetailPanel {
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.8em;
+            z-index: 10;
         }
         .copy-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
+        }
+        /* Vertical Table Styles */
+        .value-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--vscode-editor-font-size);
+            font-family: var(--vscode-editor-font-family);
+        }
+        .value-table th, .value-table td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            vertical-align: top;
+        }
+        .value-table th {
+             color: var(--vscode-descriptionForeground);
+             border-bottom: 2px solid var(--vscode-panel-border);
+             font-weight: bold; 
+        }
+        .key-col {
+            font-weight: bold;
+            color: var(--vscode-symbolIcon-propertyForeground);
+            width: 30%;
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+        .val-col {
+            word-wrap: break-word;
+            white-space: pre-wrap; 
         }
     </style>
 </head>
@@ -169,8 +231,8 @@ export class KeyDetailPanel {
 
     <h3>Value</h3>
     <div class="value-section">
-        <button class="copy-btn" id="copyBtn">Copy</button>
-        <pre>${this._escapeHtml(formattedValue)}</pre>
+        <button class="copy-btn" id="copyBtn">Copy JSON</button>
+        ${valueHtml}
     </div>
 
     <script>
