@@ -60,9 +60,9 @@ export class KeyDetailPanel {
         let formattedValue = '';
         let isJson = false;
         let valueHtml = '';
-
         let parsedData: any = null;
 
+        // Try to parse JSON
         if (typeof value === 'object') {
             parsedData = value;
             formattedValue = JSON.stringify(value, null, 2);
@@ -70,39 +70,64 @@ export class KeyDetailPanel {
         } else {
             try {
                 parsedData = JSON.parse(value);
-                formattedValue = JSON.stringify(parsedData, null, 2);
-                isJson = true;
+                // Handle case where JSON.parse returns a number or string but not an object/array
+                if (typeof parsedData === 'object' && parsedData !== null) {
+                    formattedValue = JSON.stringify(parsedData, null, 2);
+                    isJson = true;
+                } else {
+                    formattedValue = String(value);
+                    isJson = false;
+                }
             } catch {
                 formattedValue = String(value);
             }
         }
 
-        // Generate Table or Pre block
-        if (isJson && typeof parsedData === 'object' && parsedData !== null) {
-            valueHtml = '<table class="value-table">';
-            if (Array.isArray(parsedData)) {
-                // Array handling
-                valueHtml += '<thead><tr><th>Index</th><th>Value</th></tr></thead><tbody>';
-                parsedData.forEach((item, index) => {
-                    const itemStr = typeof item === 'object' ? JSON.stringify(item) : String(item);
-                    valueHtml += `<tr><td class="key-col">${index}</td><td class="val-col">${this._escapeHtml(itemStr)}</td></tr>`;
-                });
-                valueHtml += '</tbody>';
-            } else {
-                // Object handling
-                valueHtml += '<thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>';
-                Object.keys(parsedData).forEach(k => {
-                    const v = parsedData[k];
-                    const vStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
-                    valueHtml += `<tr><td class="key-col">${this._escapeHtml(k)}</td><td class="val-col">${this._escapeHtml(vStr)}</td></tr>`;
-                });
-                valueHtml += '</tbody>';
-            }
-            valueHtml += '</table>';
-        } else {
-            valueHtml = `<pre>${this._escapeHtml(formattedValue)}</pre>`;
-        }
+        // Generate HTML based on data type
+        if (isJson && parsedData) {
+            valueHtml = `<div class="property-list">`;
 
+            if (Array.isArray(parsedData)) {
+                // Array Array Data
+                valueHtml += `<div class="list-header">Array (${parsedData.length} items)</div>`;
+                parsedData.forEach((item, index) => {
+                    const val = typeof item === 'object' ? JSON.stringify(item) : String(item);
+                    valueHtml += `
+                        <div class="property-row">
+                            <div class="property-key index-key">${index}</div>
+                            <div class="property-value">${this._escapeHtml(val)}</div>
+                        </div>`;
+                });
+            } else {
+                // Object Data
+                const keys = Object.keys(parsedData);
+                if (keys.length === 0) {
+                    valueHtml += `<div class="empty-state">Empty Object</div>`;
+                } else {
+                    keys.forEach(k => {
+                        const val = parsedData[k];
+                        // If value is a complex object, render it as pretty JSON to maintain "Vertical" flow but show detail
+                        const displayVal = typeof val === 'object'
+                            ? `<pre class="nested-json">${this._escapeHtml(JSON.stringify(val, null, 2))}</pre>`
+                            : this._escapeHtml(String(val));
+
+                        valueHtml += `
+                            <div class="property-row">
+                                <div class="property-key">${this._escapeHtml(k)}</div>
+                                <div class="property-value">${displayVal}</div>
+                            </div>`;
+                    });
+                }
+            }
+            valueHtml += `</div>`;
+        } else {
+            // Raw String Data
+            valueHtml = `
+                <div class="code-card">
+                    <pre>${this._escapeHtml(formattedValue)}</pre>
+                </div>
+            `;
+        }
 
         return `<!DOCTYPE html>
 <html lang="en">
@@ -111,136 +136,179 @@ export class KeyDetailPanel {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Key Details</title>
     <style>
+        :root {
+            --row-hover-bg: var(--vscode-list-hoverBackground);
+            --key-color: var(--vscode-textPreformat-foreground); 
+            --border-color: var(--vscode-panel-border);
+            --header-bg: var(--vscode-editor-inactiveSelectionBackground);
+        }
         body {
             background-color: var(--vscode-editor-background);
             color: var(--vscode-editor-foreground);
             font-family: var(--vscode-font-family);
+            font-size: var(--vscode-font-size);
             padding: 20px;
+            margin: 0;
+            line-height: 1.5;
         }
-        .header {
+
+        /* Header Section */
+        .header-container {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
         }
         .key-name {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: var(--vscode-editor-foreground);
+            font-size: 1.6em;
+            font-weight: 600;
+            word-break: break-all;
+            color: var(--vscode-foreground);
+        }
+        .badges {
+            display: flex;
+            gap: 8px;
         }
         .badge {
             background-color: var(--vscode-badge-background);
             color: var(--vscode-badge-foreground);
             padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .metadata-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 0.9em;
+        
+        /* Actions */
+        .actions-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
         }
-        .metadata-table th, .metadata-table td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid var(--vscode-panel-border);
-        }
-        .metadata-table th {
-            color: var(--vscode-descriptionForeground);
-            width: 150px;
-        }
-        .value-section {
-            background-color: var(--vscode-editor-inactiveSelectionBackground);
-            padding: 15px;
-            border-radius: 6px;
-            position: relative;
-            overflow-x: auto;
-        }
-        pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: var(--vscode-editor-font-family);
-            font-size: var(--vscode-editor-font-size);
-        }
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+        .action-btn {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8em;
-            z-index: 10;
+            font-size: 0.85em;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .copy-btn:hover {
+        .action-btn:hover {
             background-color: var(--vscode-button-hoverBackground);
         }
-        /* Vertical Table Styles */
-        .value-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: var(--vscode-editor-font-size);
+
+        /* Property List Style */
+        .property-list {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .list-header {
+            background-color: var(--header-bg);
+            padding: 8px 16px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--vscode-descriptionForeground);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .property-row {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .property-row:last-child {
+            border-bottom: none;
+        }
+        .property-row:hover {
+            background-color: var(--row-hover-bg);
+        }
+        .property-key {
+            width: 30%;
+            min-width: 120px;
+            max-width: 250px;
+            padding: 10px 16px;
+            font-weight: 600;
+            color: var(--vscode-descriptionForeground);
+            border-right: 1px solid var(--border-color);
+            word-break: break-word; /* Ensure long keys wrap */
+            background-color: rgba(128, 128, 128, 0.05); /* Slight tint for keys */
+        }
+        .index-key {
+            font-family: var(--vscode-editor-font-family);
+            color: var(--vscode-symbolIcon-numberForeground);
+        }
+        .property-value {
+            flex: 1;
+            padding: 10px 16px;
+            font-family: var(--vscode-editor-font-family);
+            word-break: break-word;
+            white-space: pre-wrap;
+            color: var(--vscode-editor-foreground);
+        }
+        
+        /* Special formatting for nested JSON */
+        .nested-json {
+            margin: 0;
+            font-size: 0.9em;
+            background: rgba(0,0,0,0.1);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        /* Code Card for raw strings */
+        .code-card {
+            background-color: var(--vscode-textBlockQuote-background);
+            border-left: 4px solid var(--vscode-textBlockQuote-border);
+            padding: 16px;
+            border-radius: 4px;
+        }
+        .code-card pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
             font-family: var(--vscode-editor-font-family);
         }
-        .value-table th, .value-table td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid var(--vscode-panel-border);
-            vertical-align: top;
+        
+        .empty-state {
+            padding: 24px;
+            text-align: center;
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
         }
-        .value-table th {
-             color: var(--vscode-descriptionForeground);
-             border-bottom: 2px solid var(--vscode-panel-border);
-             font-weight: bold; 
-        }
-        .key-col {
-            font-weight: bold;
-            color: var(--vscode-symbolIcon-propertyForeground);
-            width: 30%;
-            max-width: 200px;
-            word-wrap: break-word;
-        }
-        .val-col {
-            word-wrap: break-word;
-            white-space: pre-wrap; 
-        }
+
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="header-container">
         <span class="key-name">${key}</span>
-        <span class="badge">${type}</span>
+        <div class="badges">
+            <span class="badge">${type}</span>
+            <span class="badge">${ttl === -1 ? 'Persistent' : ttl + 's'}</span>
+            <span class="badge">${new Blob([formattedValue]).size} bytes</span>
+        </div>
     </div>
 
-    <table class="metadata-table">
-        <tr>
-            <th>TTL</th>
-            <td>${ttl === -1 ? 'Persistent' : ttl + 's'}</td>
-        </tr>
-         <tr>
-            <th>Type</th>
-            <td>${type}</td>
-        </tr>
-    </table>
-
-    <h3>Value</h3>
-    <div class="value-section">
-        <button class="copy-btn" id="copyBtn">Copy JSON</button>
-        ${valueHtml}
+    <div class="actions-bar">
+        <button class="action-btn" id="copyBtn">
+            <span>Copy Raw JSON</span>
+        </button>
     </div>
+
+    ${valueHtml}
 
     <script>
         const vscode = acquireVsCodeApi();
         document.getElementById('copyBtn').addEventListener('click', () => {
             vscode.postMessage({
                 command: 'copy',
-                text: ${JSON.stringify(formattedValue)}
+                text: ${JSON.stringify(formattedValue)} // Send the raw stringified value
             });
         });
     </script>

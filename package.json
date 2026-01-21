@@ -21,7 +21,7 @@
                 {
                     "id": "redis-explorer-container",
                     "title": "Redis Radar",
-                    "icon": "resources/redis-icon.svg"
+                    "icon": "resources/redis-radar-icon.svg"
                 }
             ]
         },

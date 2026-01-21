@@ -15,9 +15,7 @@ export class RedisTreeProvider implements vscode.TreeDataProvider<RedisParams> {
     refresh(): void {
         this.allKeys = [];
         this.currentCursor = '0';
-        // Reset filter on full refresh? Or keep it? The user might expect 'Refresh' to keep search.
-        // Let's keep filter unless explicitly cleared. But standard behavior is reload.
-        // If we want to support search, we should keep it.
+        this.filter = '*'; // Reset filter to show all keys
         this._onDidChangeTreeData.fire();
     }
 
