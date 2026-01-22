@@ -35,6 +35,7 @@
                 {
                     "id": "redisExplorer",
                     "name": "Explorer",
+                    "type": "webview",
                     "icon": "$(list-tree)"
                 }
             ]
@@ -91,16 +92,6 @@
                 {
                     "command": "redisLite.addConnection",
                     "when": "view == redisConnections",
-                    "group": "navigation"
-                },
-                {
-                    "command": "redisLite.refresh",
-                    "when": "view == redisExplorer && redisLite:isConnected",
-                    "group": "navigation"
-                },
-                {
-                    "command": "redisLite.search",
-                    "when": "view == redisExplorer && redisLite:isConnected",
                     "group": "navigation"
                 },
                 {
