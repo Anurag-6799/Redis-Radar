@@ -155,31 +155,49 @@ export class KeyDetailPanel {
         /* Header Section */
         .header-container {
             display: flex;
-            align-items: baseline;
+            flex-direction: column;
+            align-items: flex-start;
             gap: 12px;
             margin-bottom: 24px;
-            padding-bottom: 12px;
+            padding-bottom: 16px;
             border-bottom: 1px solid var(--border-color);
+            width: 100%;
         }
         .key-name {
-            font-size: 1.6em;
+            font-size: 1.4em;
             font-weight: 600;
             word-break: break-all;
+            white-space: pre-wrap;
+            line-height: 1.4;
             color: var(--vscode-foreground);
         }
         .badges {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 4px;
         }
         .badge {
-            background-color: var(--vscode-badge-background);
-            color: var(--vscode-badge-foreground);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
             font-size: 0.75em;
-            font-weight: 500;
-            text-transform: uppercase;
+            font-weight: 600;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+            opacity: 0.9;
+        }
+        .badge-type {
+            color: var(--vscode-symbolIcon-classForeground);
+            background-color: var(--vscode-editor-selectionBackground); /* Subtle tint */
+        }
+        .badge-ttl {
+            color: var(--vscode-symbolIcon-keywordForeground);
+            background-color: var(--vscode-editor-selectionBackground);
+        }
+        .badge-size {
+            color: var(--vscode-symbolIcon-constantForeground);
+            background-color: var(--vscode-editor-selectionBackground);
         }
         
         /* Actions */
@@ -289,9 +307,9 @@ export class KeyDetailPanel {
     <div class="header-container">
         <span class="key-name">${key}</span>
         <div class="badges">
-            <span class="badge">${type}</span>
-            <span class="badge">${ttl === -1 ? 'Persistent' : ttl + 's'}</span>
-            <span class="badge">${new Blob([formattedValue]).size} bytes</span>
+            <span class="badge badge-type">${type}</span>
+            <span class="badge badge-ttl">${ttl === -1 ? 'Persistent' : ttl + 's'}</span>
+            <span class="badge badge-size">${new Blob([formattedValue]).size} bytes</span>
         </div>
     </div>
 
