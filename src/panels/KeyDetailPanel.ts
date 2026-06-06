@@ -305,11 +305,11 @@ export class KeyDetailPanel {
 </head>
 <body>
     <div class="header-container">
-        <span class="key-name">${key}</span>
+        <span class="key-name">${this._escapeHtml(key)}</span>
         <div class="badges">
             <span class="badge badge-type">${type}</span>
             <span class="badge badge-ttl">${ttl === -1 ? 'Persistent' : ttl + 's'}</span>
-            <span class="badge badge-size">${new Blob([formattedValue]).size} bytes</span>
+            <span class="badge badge-size">${Buffer.byteLength(formattedValue, 'utf8')} bytes</span>
         </div>
     </div>
 
@@ -326,7 +326,7 @@ export class KeyDetailPanel {
         document.getElementById('copyBtn').addEventListener('click', () => {
             vscode.postMessage({
                 command: 'copy',
-                text: ${JSON.stringify(formattedValue)} // Send the raw stringified value
+                text: ${JSON.stringify(formattedValue).replace(/</g, '\\u003c')} // Send the raw stringified value
             });
         });
     </script>

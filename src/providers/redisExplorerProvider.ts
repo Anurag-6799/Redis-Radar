@@ -121,6 +121,15 @@ export class RedisExplorerProvider implements vscode.WebviewViewProvider {
         }
     }
 
+    private _escapeHtml(unsafe: string) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     private _getHtmlForWebview(webview: vscode.Webview, searchTerm: string = '') {
         // Use VS Code standard CSS vars
         return `<!DOCTYPE html>
@@ -260,7 +269,7 @@ export class RedisExplorerProvider implements vscode.WebviewViewProvider {
         <body>
             <div class="search-header">
                 <div class="search-row">
-                    <input type="text" id="searchInput" placeholder="Search keys (e.g. user)" value="${searchTerm}" />
+                    <input type="text" id="searchInput" placeholder="Search keys (e.g. user)" value="${this._escapeHtml(searchTerm)}" />
                     <button class="icon-btn" id="refreshBtn" title="Refresh">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.6 2.3C12.2.9 10.2 0 8 0 3.6 0 0 3.6 0 8s3.6 8 8 8c3.7 0 6.8-2.5 7.7-6h-2.1c-.8 2.3-3 4-5.6 4-3.3 0-6-2.7-6-6s2.7-6 6-6c1.7 0 3.1.7 4.2 1.8L9 7h7V0l-2.4 2.3z"/></svg>
                     </button>
@@ -326,7 +335,11 @@ export class RedisExplorerProvider implements vscode.WebviewViewProvider {
                     keyList.innerHTML = '';
                     
                     if (error) {
-                         keyList.innerHTML = '<div class="error-msg">' + error + '</div>';
+                         keyList.innerHTML = '';
+                         const errorDiv = document.createElement('div');
+                         errorDiv.className = 'error-msg';
+                         errorDiv.textContent = error;
+                         keyList.appendChild(errorDiv);
                          return;
                     }
 
@@ -336,10 +349,18 @@ export class RedisExplorerProvider implements vscode.WebviewViewProvider {
                         keys.forEach(key => {
                             const li = document.createElement('li');
                             li.className = 'key-item';
-                            li.innerHTML = \`
-                                <span class="key-label">\${key}</span>
-                                <button class="delete-btn" title="Delete Key">×</button>
-                            \`;
+                            
+                            const span = document.createElement('span');
+                            span.className = 'key-label';
+                            span.textContent = key;
+                            
+                            const btn = document.createElement('button');
+                            btn.className = 'delete-btn';
+                            btn.title = 'Delete Key';
+                            btn.textContent = '×';
+                            
+                            li.appendChild(span);
+                            li.appendChild(btn);
                             
                             // Click to open
                             li.addEventListener('click', (e) => {

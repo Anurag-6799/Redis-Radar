@@ -217,7 +217,11 @@ export class AddConnectionPanel {
             const message = event.data;
             switch (message.command) {
                 case 'testResult':
-                    statusDiv.innerHTML = \`<span class="\${message.success ? 'success' : 'error'}">\${message.message}</span>\`;
+                    statusDiv.innerHTML = '';
+                    const span = document.createElement('span');
+                    span.className = message.success ? 'success' : 'error';
+                    span.textContent = message.message;
+                    statusDiv.appendChild(span);
                     break;
             }
         });
