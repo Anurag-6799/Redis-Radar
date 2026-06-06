@@ -13,7 +13,7 @@ export function addConnection(context: vscode.ExtensionContext, manager: Connect
 export async function connectToRedis(item: ResultItem, manager: ConnectionManager, provider: RedisConnectionProvider) {
     if (!item.connectionId) return;
 
-    const connections = manager.getConnections();
+    const connections = await manager.getConnections();
     const conn = connections.find(c => c.id === item.connectionId);
 
     if (conn) {

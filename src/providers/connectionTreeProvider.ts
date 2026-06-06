@@ -20,7 +20,7 @@ export class RedisConnectionProvider implements vscode.TreeDataProvider<ResultIt
         if (element) {
             return [];
         } else {
-            const connections = this.connectionManager.getConnections();
+            const connections = await this.connectionManager.getConnections();
             return connections.map(conn => {
                 const item = new ResultItem(conn.name, vscode.TreeItemCollapsibleState.None);
                 const isActive = RedisService.getInstance().getActiveConnectionId() === conn.id;

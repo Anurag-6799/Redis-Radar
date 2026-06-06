@@ -42,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
                 );
                 if (answer === 'Yes') {
                     try {
-                        await RedisService.getInstance().flushDb();
+                        await RedisService.getInstance().flushDb(true);
                         vscode.window.showInformationMessage('Database flushed.');
                         redisExplorerProvider.refresh();
                     } catch (error: any) {

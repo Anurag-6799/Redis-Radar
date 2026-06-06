@@ -123,12 +123,14 @@ export class RedisService {
         return { type, ttl, value };
     }
 
-    async deleteKey(key: string): Promise<void> {
+    async deleteKey(key: string, confirm: boolean = false): Promise<void> {
+        if (!confirm) throw new Error("Deletion must be confirmed");
         if (!this.client) throw new Error("No active connection");
         await this.client.del(key);
     }
 
-    async flushDb(): Promise<void> {
+    async flushDb(confirm: boolean = false): Promise<void> {
+        if (!confirm) throw new Error("Flush must be confirmed");
         if (!this.client) throw new Error("No active connection");
         await this.client.flushdb();
     }

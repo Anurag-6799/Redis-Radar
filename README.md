@@ -66,3 +66,12 @@ Redis Radar brings a full-featured Redis GUI right into VS Code, designed for de
 - **VS Code**: v1.85.0 or higher.
 - **Redis Server**: Local, Docker, or Cloud instance.
 
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+> **THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED... IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE...**
+
+See the [LICENSE](LICENSE) file for more details.

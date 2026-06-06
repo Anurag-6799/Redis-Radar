@@ -64,7 +64,7 @@ export class RedisExplorerProvider implements vscode.WebviewViewProvider {
                     // Verify deletion
                     const answer = await vscode.window.showWarningMessage(`Are you sure you want to delete key: ${data.key}?`, 'Yes', 'No');
                     if (answer === 'Yes') {
-                        await RedisService.getInstance().deleteKey(data.key);
+                        await RedisService.getInstance().deleteKey(data.key, true);
                         // Refresh logic - ideally just remove from local list to avoid full reload
                         this.allKeys = this.allKeys.filter(k => k !== data.key);
                         this.updateWebview();
@@ -369,9 +369,11 @@ export class RedisExplorerProvider implements vscode.WebviewViewProvider {
                             });
 
                             // Click delete
-                            li.querySelector('.delete-btn').addEventListener('click', (e) => {
+                            btn.addEventListener('click', (e) => {
                                 e.stopPropagation();
-                                vscode.postMessage({ type: 'deleteKey', key: key });
+                                if (confirm('Are you sure you want to delete key: ' + key + '?')) {
+                                    vscode.postMessage({ type: 'deleteKey', key: key });
+                                }
                             });
 
                             keyList.appendChild(li);
